@@ -1,29 +1,31 @@
-# import lasio
-
-# las = lasio.read("WLC_PETRO_COMPUTED_INPUT_1.las")
-
-# print(las.params)
-
-
 import numpy as np
+import pandas as pd
 import matplotlib.pylab as pl
-
-filename="WLC_PETRO_COMPUTED_INPUT_1_SEMHEADER.las"
-
-Matrix = np.loadtxt(filename, unpack = True)
-
-np.shape(Matrix)
-
-Matrix[ Matrix==-999.25] = np.nan
-depth = Matrix[0,:]
-log1 = Matrix[7,:]
-# log2 =Matrix[8,:]
-# log3 =Matrix[14,:]
+import lasio
 
 
-print(np.shape(log1))
-print(np.shape(depth))
+las = lasio.read("data/1FL1PI.las")
 
-pl.plot(depth,log1)
-pl.draw()
-pl.show()
+lasdata = las.df()
+
+print(las.keys())
+print(las.version)
+
+lasdata.fillna(value=-999.25)
+
+lasdata["FACIES"] = lasdata['GR'] - lasdata['NEUT']
+
+cols = lasdata.columns.tolist()
+
+cols = cols[-1:] + cols[:-1]
+
+lasdata =lasdata[cols]
+
+print(lasdata.describe())
+
+# ztop=lasdata.DEPTH.min(); zbot=lasdata.DEPTH.max()
+
+# pl.plot(lasdata.GR,lasdata.DEPTH,'-')
+
+# pl.axis([lasdata.GR.min(), lasdata.GR.max(), lasdata.DEPTH.max(), lasdata.DEPTH.min()])
+# pl.show()
